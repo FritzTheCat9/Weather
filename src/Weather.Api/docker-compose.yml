@@ -1,0 +1,41 @@
+services:
+  weather.api:
+    image: ${DOCKER_REGISTRY-}weatherapi
+    container_name: weather.api
+    build:
+      context: .
+      dockerfile: Weather.Api/Dockerfile
+    ports:
+      - 5000:5000
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_HTTP_PORTS=5000
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./Weather.Api/Logging/Logs:/app/Logging/Logs
+      
+  weather.database:
+    image: mcr.microsoft.com/mssql/server:latest
+    container_name: weather.database
+    shm_size: 4gb
+    restart: unless-stopped
+    ports:
+      - 1433:1433
+    environment:
+      MSSQL_SA_PASSWORD: 'Password1!'
+      ACCEPT_EULA: 'Y'
+    volumes:
+      - mssql_volume:/var/opt/mssql
+
+  weather.seq:
+    image: datalust/seq:latest
+    container_name: weather.seq
+    ports:
+      - 5341:5341
+      - 8081:80
+    environment:
+      ACCEPT_EULA: 'Y'
+
+volumes:
+  mssql_volume:
+    driver: local

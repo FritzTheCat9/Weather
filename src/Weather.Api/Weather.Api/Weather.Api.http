@@ -1,6 +1,40 @@
-@Weather.Api_HostAddress = http://localhost:5000
+@host = http://localhost:5000
+@contentType = application/json
 
-GET {{Weather.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+@id = 1
 
 ###
+# @name CreateCity
+POST {{host}}/api/cities
+Content-Type: {{contentType}}
+
+{
+    "name": "Bia³ystok"
+}
+
+###
+# @name DeleteCity
+DELETE {{host}}/api/cities/{{id}}
+
+###
+# @name UpdateCity
+PUT {{host}}/api/cities/{{id}}
+Content-Type: {{contentType}}
+
+{
+    "id": {{id}},
+    "name": "Piaseczno"
+}
+
+###
+# @name GetAllCities
+POST {{host}}/api/cities/all
+Content-Type: {{contentType}}
+
+{
+
+}
+
+###
+# @name GetCity
+GET {{host}}/api/cities/{{id}}
