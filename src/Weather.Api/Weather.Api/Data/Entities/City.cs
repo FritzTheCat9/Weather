@@ -1,8 +1,7 @@
-﻿namespace Weather.Api.Data.Entities
+﻿namespace Weather.Api.Data.Entities;
+
+public class City
 {
-    public class City
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
 }

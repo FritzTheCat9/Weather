@@ -1,7 +1,6 @@
-﻿namespace Weather.Api.Auth
+﻿namespace Weather.Api.Auth;
+
+public class AuthOptions
 {
-    public class AuthOptions
-    {
-        public string FrontendUrl { get; init; }
-    }
+    public string FrontendUrl { get; init; }
 }

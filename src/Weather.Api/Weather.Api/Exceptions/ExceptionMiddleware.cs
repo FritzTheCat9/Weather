@@ -1,80 +1,79 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Weather.Api.Exceptions
+namespace Weather.Api.Exceptions;
+
+public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger) : IMiddleware
 {
-    public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger) : IMiddleware
+    public async Task InvokeAsync(
+        HttpContext context,
+        RequestDelegate next)
     {
-        public async Task InvokeAsync(
-            HttpContext context,
-            RequestDelegate next)
+        try
         {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception exception)
-            {
-                logger.LogError("[Api Exception] {Exception}", exception);
-                await HandleExceptionAsync(exception, context);
-            }
+            await next(context);
         }
-
-        private static async Task HandleExceptionAsync(
-            Exception exception,
-            HttpContext context)
+        catch (Exception exception)
         {
-            var errorHelperModel = exception switch
-            {
-                MyValidationException validationException =>
-                    new ErrorHelperModel(
-                        StatusCodes.Status400BadRequest,
-                        new ValidationErrorResponse(validationException.Type, validationException.Message,
-                            validationException.Errors)),
-                MyServerException serverException =>
-                    new ErrorHelperModel(
-                        StatusCodes.Status500InternalServerError,
-                        new ServerErrorResponse(serverException.Type, serverException.Message)),
-                MyUnauthorizedException unauthorizedException =>
-                    new ErrorHelperModel(
-                        StatusCodes.Status401Unauthorized,
-                        new UnauthorizedErrorResponse(unauthorizedException.Type, unauthorizedException.Message)),
-                MyForbiddenException forbiddenException =>
-                    new ErrorHelperModel(
-                        StatusCodes.Status403Forbidden,
-                        new ForbiddenErrorResponse(forbiddenException.Type, forbiddenException.Message)),
-                MyNotFoundException notFoundException =>
-                    new ErrorHelperModel(
-                        StatusCodes.Status404NotFound,
-                        new NotFoundErrorResponse(notFoundException.Type, notFoundException.Message)),
-                _ =>
-                    new ErrorHelperModel(
-                        StatusCodes.Status500InternalServerError,
-                        new ServerErrorResponse(ExceptionType.Server, "Server Error"))
-            };
+            logger.LogError("[Api Exception] {Exception}", exception);
+            await HandleExceptionAsync(exception, context);
+        }
+    }
 
-            context.Response.StatusCode = errorHelperModel.StatusCode;
-            context.Response.ContentType = "application/json";
+    private static async Task HandleExceptionAsync(
+        Exception exception,
+        HttpContext context)
+    {
+        var errorHelperModel = exception switch
+        {
+            MyValidationException validationException =>
+                new ErrorHelperModel(
+                    StatusCodes.Status400BadRequest,
+                    new ValidationErrorResponse(validationException.Type, validationException.Message,
+                        validationException.Errors)),
+            MyServerException serverException =>
+                new ErrorHelperModel(
+                    StatusCodes.Status500InternalServerError,
+                    new ServerErrorResponse(serverException.Type, serverException.Message)),
+            MyUnauthorizedException unauthorizedException =>
+                new ErrorHelperModel(
+                    StatusCodes.Status401Unauthorized,
+                    new UnauthorizedErrorResponse(unauthorizedException.Type, unauthorizedException.Message)),
+            MyForbiddenException forbiddenException =>
+                new ErrorHelperModel(
+                    StatusCodes.Status403Forbidden,
+                    new ForbiddenErrorResponse(forbiddenException.Type, forbiddenException.Message)),
+            MyNotFoundException notFoundException =>
+                new ErrorHelperModel(
+                    StatusCodes.Status404NotFound,
+                    new NotFoundErrorResponse(notFoundException.Type, notFoundException.Message)),
+            _ =>
+                new ErrorHelperModel(
+                    StatusCodes.Status500InternalServerError,
+                    new ServerErrorResponse(ExceptionType.Server, "Server Error"))
+        };
 
-            var settings = new JsonSerializerSettings
+        context.Response.StatusCode = errorHelperModel.StatusCode;
+        context.Response.ContentType = "application/json";
+
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver
+                NamingStrategy = new CamelCaseNamingStrategy
                 {
-                    NamingStrategy = new CamelCaseNamingStrategy
-                    {
-                        ProcessDictionaryKeys = false
-                    }
+                    ProcessDictionaryKeys = false
                 }
-            };
+            }
+        };
 
-            var jsonString = JsonConvert.SerializeObject(errorHelperModel.ErrorResponse, settings);
-            await context.Response.WriteAsync(jsonString);
-        }
+        var jsonString = JsonConvert.SerializeObject(errorHelperModel.ErrorResponse, settings);
+        await context.Response.WriteAsync(jsonString);
+    }
 
-        private class ErrorHelperModel(int statusCode, ErrorResponse errorResponse)
-        {
-            public int StatusCode { get; } = statusCode;
-            public ErrorResponse ErrorResponse { get; } = errorResponse;
-        }
+    private class ErrorHelperModel(int statusCode, ErrorResponse errorResponse)
+    {
+        public int StatusCode { get; } = statusCode;
+        public ErrorResponse ErrorResponse { get; } = errorResponse;
     }
 }

@@ -13,7 +13,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ./Weather.Api/Logging/Logs:/app/Logging/Logs
-      
+  
   weather.database:
     image: mcr.microsoft.com/mssql/server:latest
     container_name: weather.database

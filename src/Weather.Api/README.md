@@ -53,7 +53,7 @@ http://localhost:8081
 
 - C# 13
 - .NET 9.0
-- Angular 
+- Angular
 
 ## Architecture
 

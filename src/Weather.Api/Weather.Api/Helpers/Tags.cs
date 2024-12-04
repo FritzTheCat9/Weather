@@ -1,7 +1,6 @@
-﻿namespace Weather.Api.Helpers
+﻿namespace Weather.Api.Helpers;
+
+public static class Tags
 {
-    public static class Tags
-    {
-        public const string Cities = "Cities";
-    }
+    public const string Cities = "Cities";
 }

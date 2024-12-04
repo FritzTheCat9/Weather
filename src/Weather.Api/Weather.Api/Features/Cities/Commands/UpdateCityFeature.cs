@@ -4,57 +4,56 @@ using Weather.Api.Data.Repositories;
 using Weather.Api.Exceptions;
 using Weather.Api.Helpers;
 
-namespace Weather.Api.Features.Cities.Commands
+namespace Weather.Api.Features.Cities.Commands;
+
+public static class UpdateCityFeature
 {
-    public static class UpdateCityFeature
+    public class Command : IRequest<Unit>
     {
-        public class Command : IRequest<Unit>
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-        }
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 
-        public class Validator : AbstractValidator<Command>
+    public class Validator : AbstractValidator<Command>
+    {
+        public Validator()
         {
-            public Validator()
-            {
-                // name not empty 
-                // first name letter should be from uppercase
-            }
+            // name not empty 
+            // first name letter should be from uppercase
         }
+    }
 
-        public static void Endpoint(this IEndpointRouteBuilder app)
-        {
-            app.MapPut("/api/cities/{id:int}", async (
-                    int id,
-                    Command command,
-                    IMediator mediator,
-                    CancellationToken cancellationToken) =>
+    public static void Endpoint(this IEndpointRouteBuilder app)
+    {
+        app.MapPut("/api/cities/{id:int}", async (
+                int id,
+                Command command,
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
             {
                 command.Id = id;
                 return Results.Ok(await mediator.Send(command, cancellationToken));
             })
-                .WithTags(Tags.Cities)
-                .AllowAnonymous();
-        }
+            .WithTags(Tags.Cities)
+            .AllowAnonymous();
+    }
 
-        public class Handler(
-            ICityRepository cityRepository)
-            : IRequestHandler<Command, Unit>
+    public class Handler(
+        ICityRepository cityRepository)
+        : IRequestHandler<Command, Unit>
+    {
+        public async Task<Unit> Handle(
+            Command command,
+            CancellationToken cancellationToken)
         {
-            public async Task<Unit> Handle(
-                Command command,
-                CancellationToken cancellationToken)
-            {
-                var city = await cityRepository.Get(command.Id) ?? throw new MyNotFoundException();
+            var city = await cityRepository.Get(command.Id) ?? throw new MyNotFoundException();
 
-                //check if name exists
+            //check if name exists
 
-                city.Name = command.Name;
+            city.Name = command.Name;
 
-                await cityRepository.Update(city);
-                return Unit.Value;
-            }
+            await cityRepository.Update(city);
+            return Unit.Value;
         }
     }
 }

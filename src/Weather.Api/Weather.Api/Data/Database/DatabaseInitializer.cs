@@ -1,30 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Weather.Api.Data.Database
+namespace Weather.Api.Data.Database;
+
+public class DatabaseInitializer(
+    IServiceProvider serviceProvider,
+    ILogger<DatabaseInitializer> logger)
+    : IHostedService
 {
-    public class DatabaseInitializer(
-        IServiceProvider serviceProvider,
-        ILogger<DatabaseInitializer> logger)
-        : IHostedService
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            using var scope = serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        using var scope = serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            try
-            {
-                await dbContext.Database.MigrateAsync(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError("[DatabaseInitializer] Error while creating and migrating the database: {0}", ex.Message);
-            }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
+        try
         {
-            return Task.CompletedTask;
+            await dbContext.Database.MigrateAsync(cancellationToken);
         }
+        catch (Exception ex)
+        {
+            logger.LogError("[DatabaseInitializer] Error while creating and migrating the database: {0}", ex.Message);
+        }
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }
