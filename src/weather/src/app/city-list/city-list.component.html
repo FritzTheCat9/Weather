@@ -7,7 +7,10 @@
           <img src="icons/pencil.svg" alt="Update" class="w-6 h-6" />
         </button>
 
-        <button class="bg-red-500 p-2 rounded-lg hover:bg-red-600">
+        <button
+          class="bg-red-500 p-2 rounded-lg hover:bg-red-600"
+          (click)="deleteCity(city.id)"
+        >
           <img src="icons/delete.svg" alt="Delete" class="w-6 h-6" />
         </button>
       </div>

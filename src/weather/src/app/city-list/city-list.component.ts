@@ -16,9 +16,24 @@ export class CityListComponent {
   constructor(private cityService: CityService) {}
 
   ngOnInit(): void {
+    this.getAllCities();
+  }
+
+  getAllCities() {
     this.cityService.getAllCities(this.query).subscribe({
       next: (data) => {
         this.cities = data;
+      },
+      error: (err) => {
+        console.error('Error:', err);
+      },
+    });
+  }
+
+  deleteCity(id: number) {
+    this.cityService.deleteCity(id).subscribe({
+      next: () => {
+        this.getAllCities();
       },
       error: (err) => {
         console.error('Error:', err);

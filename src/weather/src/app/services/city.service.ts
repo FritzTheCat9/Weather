@@ -13,6 +13,10 @@ export class CityService {
   constructor(private http: HttpClient) {}
 
   getAllCities(query: GetAllCitiesQuery): Observable<CityDto[]> {
-    return this.http.post<CityDto[]>(this.apiUrl + '/all', query);
+    return this.http.post<CityDto[]>(`${this.apiUrl}/all`, query);
+  }
+
+  deleteCity(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
