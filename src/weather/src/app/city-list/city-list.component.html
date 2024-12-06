@@ -1,11 +1,36 @@
 <div class="max-w-7xl mx-auto py-4 px-4">
-  <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
+  <button
+    class="bg-green-500 p-2 rounded-lg hover:bg-green-600"
+    (click)="openCreateCityDialog()"
+  >
+    <img src="icons/plus.svg" alt="Create" class="w-6 h-6" />
+  </button>
+
+  <app-create-city-dialog
+    [isOpen]="showCreateCityDialog"
+    [title]="createCityDialogTitle"
+    (closeDialog)="closeCreateCityDialog()"
+    (createCity)="onCityCreated($event)"
+  />
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
     @for (city of cities; track $index) {
     <div class="bg-white shadow-md rounded-lg">
       <div class="p-4 flex justify-end space-x-2">
-        <button class="bg-blue-500 p-2 rounded-lg hover:bg-blue-600">
+        <button
+          class="bg-blue-500 p-2 rounded-lg hover:bg-blue-600"
+          (click)="openUpdateCityDialog(city.id, city.name)"
+        >
           <img src="icons/pencil.svg" alt="Update" class="w-6 h-6" />
         </button>
+        <app-update-city-dialog
+          [id]="city.id"
+          [name]="selectedCityName"
+          [isOpen]="showUpdateCityDialog && selectedCityId === city.id"
+          [title]="updateCityDialogTitle"
+          (closeDialog)="closeUpdateCityDialog()"
+          (updateCity)="onCityUpdated($event)"
+        />
 
         <button
           class="bg-red-500 p-2 rounded-lg hover:bg-red-600"
