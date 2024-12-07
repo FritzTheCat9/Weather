@@ -9,6 +9,7 @@ import { UpdateCityDialogComponent } from '../update-city-dialog/update-city-dia
 import { Observable } from 'rxjs/internal/Observable';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
+import { finalize, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-city-list',
@@ -17,7 +18,8 @@ import { of } from 'rxjs/internal/observable/of';
   styleUrl: './city-list.component.css',
 })
 export class CityListComponent {
-  cities: CityDto[] | null = null;
+  cities: CityDto[] = [];
+  isLoading: boolean = false;
   query: GetAllCitiesQuery = {};
 
   constructor(private cityService: CityService) {}
@@ -29,71 +31,87 @@ export class CityListComponent {
   // api
 
   getAllCities() {
-    this.cityService.getAllCities(this.query).subscribe({
-      next: (data) => {
+    this.isLoading = true;
+    this.cityService
+      .getAllCities(this.query)
+      .pipe(
+        catchError((err) => {
+          console.error('Error fetching cities:', err);
+          return of([]);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((data) => {
         this.cities = data;
-      },
-      error: (err) => {
-        console.error('Error:', err);
-      },
-    });
+      });
   }
 
   getCity(id: number): Observable<CityDto | null> {
     return this.cityService.getCity(id).pipe(
       catchError((err) => {
-        console.error('Error:', err);
+        console.error('Error getting city:', err);
         return of(null);
       })
     );
   }
 
   deleteCity(id: number) {
-    this.cityService.deleteCity(id).subscribe({
-      next: () => {
-        this.cities = this.cities?.filter((city) => city.id !== id) ?? null;
-      },
-      error: (err) => {
-        console.error('Error:', err);
-      },
-    });
+    this.cityService
+      .deleteCity(id)
+      .pipe(
+        tap(() => {
+          this.cities = this.cities.filter((city) => city.id !== id);
+        }),
+        catchError((err) => {
+          console.error('Error deleting city:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   createCity(command: CreateCityCommand) {
-    this.cityService.createCity(command).subscribe({
-      next: (id: number) => {
-        this.getCity(id).subscribe((city) => {
+    this.cityService
+      .createCity(command)
+      .pipe(
+        switchMap((id: number) => this.getCity(id)),
+        tap((city) => {
           if (city) {
-            this.cities?.push(city);
+            this.cities.push(city);
           } else {
-            console.log('City not found or error occurred.');
+            console.error('Error creating city');
           }
-        });
-      },
-      error: (err) => {
-        console.error('Error:', err);
-      },
-    });
+        }),
+        catchError((err) => {
+          console.error('Error creating city:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   updateCity(command: UpdateCityCommand) {
-    this.cityService.updateCity(command).subscribe({
-      next: () => {
-        this.getCity(command.id).subscribe((updatedCity) => {
+    this.cityService
+      .updateCity(command)
+      .pipe(
+        switchMap(() => this.getCity(command.id)),
+        tap((updatedCity) => {
           if (updatedCity) {
-            this.cities =
-              this.cities?.map((city) =>
-                city.id === command.id ? updatedCity : city
-              ) ?? null;
+            this.cities = this.cities.map((city) =>
+              city.id === command.id ? updatedCity : city
+            );
           } else {
-            console.log('City not found or error occurred.');
+            console.error('Error updating city:');
           }
-        });
-      },
-      error: (err) => {
-        console.error('Error:', err);
-      },
-    });
+        }),
+        catchError((err) => {
+          console.error('Error updating city:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   // create

@@ -14,11 +14,11 @@
   />
 
   <div class="mt-4 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
-    @if (!cities || cities.length === 0) {
+    @if (isLoading || cities.length === 0) {
     <div class="flex justify-center items-center col-span-full">
       <p class="text-xl italic">
         {{
-          !cities
+          isLoading
             ? "Loading cities..."
             : "No cities available. Please add cities."
         }}
