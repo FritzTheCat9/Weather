@@ -14,7 +14,7 @@ import { UpdateCityDialogComponent } from '../update-city-dialog/update-city-dia
   styleUrl: './city-list.component.css',
 })
 export class CityListComponent {
-  cities: CityDto[] = [];
+  cities: CityDto[] | null = null;
   query: GetAllCitiesQuery = {};
 
   constructor(private cityService: CityService) {}
@@ -29,6 +29,7 @@ export class CityListComponent {
     this.cityService.getAllCities(this.query).subscribe({
       next: (data) => {
         this.cities = data;
+        console.log(data);
       },
       error: (err) => {
         console.error('Error:', err);

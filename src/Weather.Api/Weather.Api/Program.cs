@@ -2,6 +2,7 @@ using Weather.Api.Data.Database;
 using Weather.Api.Exceptions;
 using Weather.Api.Extensions;
 using Weather.Api.Logging;
+using Weather.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddSwagger()
     .AddDatabase(builder.Configuration)
     .AddExceptionMiddleware()
     .AddMyLogging(builder.Configuration)
+    .AddServices()
     .AddHttpContextAccessor();
 
 var app = builder.Build();

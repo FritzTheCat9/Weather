@@ -30,6 +30,17 @@ public static class CityExtensions
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public WeatherInfoDto WeatherInfoDto { get; set; }
+    }
+    
+    public class WeatherInfoDto
+    {
+        public string Temperature { get; set; }
+        public string Humidity { get; set; }
+        public string Pressure { get; set; }
+        public string Description { get; set; }
+        public string WindSpeedKmph { get; set; }
+        public string Icon { get; set; }
     }
 
     public static IEnumerable<CityDto> ToCityDtos(this IEnumerable<City> cities)

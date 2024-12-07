@@ -14,7 +14,17 @@
   />
 
   <div class="mt-4 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
-    @for (city of cities; track $index) {
+    @if (!cities || cities.length === 0) {
+    <div class="flex justify-center items-center col-span-full">
+      <p class="text-gray-500 text-xl italic">
+        {{
+          !cities
+            ? "Loading cities..."
+            : "No cities available. Please add cities."
+        }}
+      </p>
+    </div>
+    } @else { @for (city of cities; track $index) {
     <div class="bg-white shadow-md rounded-lg">
       <div class="p-4 flex justify-end space-x-2">
         <button
@@ -39,12 +49,41 @@
           <img src="icons/delete.svg" alt="Delete" class="w-6 h-6" />
         </button>
       </div>
-      <div class="p-4">
-        <h2 class="text-xl font-semibold mb-2 text-center">
+      <div class="p-4 text-center">
+        @if (city.weatherInfoDto?.icon) {
+        <span class="text-6xl"> {{ city.weatherInfoDto?.icon }}</span>
+        }
+        <h2 class="text-xl font-semibold mb-2">
           {{ city.name }}
         </h2>
+        @if (city.weatherInfoDto !== null) {
+        <div>
+          <h3 class="text-2xl font-bold mb-2">
+            {{ city.weatherInfoDto?.temperature }} ℃
+          </h3>
+          <p class="text-gray-500 mb-4">
+            {{ city.weatherInfoDto?.description }}
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="flex justify-between">
+            <span class="font-semibold">Humidity:</span>
+            <span>{{ city.weatherInfoDto?.humidity }}%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Pressure:</span>
+            <span>{{ city.weatherInfoDto?.pressure }} hPa</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-semibold">Wind Speed:</span>
+            <span>{{ city.weatherInfoDto?.windSpeedKmph }} km/h</span>
+          </div>
+        </div>
+        } @else {
+        <p class="text-gray-400 italic">No weather information available.</p>
+        }
       </div>
     </div>
-    }
+    } }
   </div>
 </div>
