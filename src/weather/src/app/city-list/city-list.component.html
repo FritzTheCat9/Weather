@@ -16,7 +16,7 @@
   <div class="mt-4 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
     @if (!cities || cities.length === 0) {
     <div class="flex justify-center items-center col-span-full">
-      <p class="text-gray-500 text-xl italic">
+      <p class="text-xl italic">
         {{
           !cities
             ? "Loading cities..."
@@ -25,7 +25,7 @@
       </p>
     </div>
     } @else { @for (city of cities; track $index) {
-    <div class="bg-white shadow-md rounded-lg">
+    <div class="shadow-lg rounded-lg bg-gray-200">
       <div class="p-4 flex justify-end space-x-2">
         <button
           class="bg-blue-500 p-2 rounded-lg hover:bg-blue-600"
@@ -53,7 +53,7 @@
         @if (city.weatherInfoDto?.icon) {
         <span class="text-6xl"> {{ city.weatherInfoDto?.icon }}</span>
         }
-        <h2 class="text-xl font-semibold mb-2">
+        <h2 class="text-xl font-semibold m-2">
           {{ city.name }}
         </h2>
         @if (city.weatherInfoDto !== null) {

@@ -3,6 +3,7 @@ using MediatR;
 using Weather.Api.Data.Repositories;
 using Weather.Api.Exceptions;
 using Weather.Api.Helpers;
+using Weather.Api.Services;
 using static Weather.Api.Features.Cities.Extensions.CityExtensions;
 
 namespace Weather.Api.Features.Cities.Queries;
@@ -32,7 +33,8 @@ public static class GetCityFeature
     }
 
     public class Handler(
-        ICityRepository cityRepository)
+        ICityRepository cityRepository,
+        IWeatherService weatherService)
         : IRequestHandler<Query, CityDto>
     {
         public async Task<CityDto> Handle(
@@ -40,8 +42,11 @@ public static class GetCityFeature
             CancellationToken cancellationToken)
         {
             var city = await cityRepository.Get(query.Id) ?? throw new MyNotFoundException();
-
-            return city.ToDto();
+            
+            var cityDto = city.ToDto();
+            cityDto.WeatherInfoDto = await weatherService.GetWeatherInfo(cityDto.Name);
+            
+            return cityDto;
         }
     }
 }

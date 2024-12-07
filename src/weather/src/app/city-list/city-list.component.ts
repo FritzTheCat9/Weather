@@ -6,6 +6,9 @@ import { CreateCityDialogComponent } from '../create-city-dialog/create-city-dia
 import { CreateCityCommand } from '../models/CreateCityCommand';
 import { UpdateCityCommand } from '../models/UpdateCityCommand';
 import { UpdateCityDialogComponent } from '../update-city-dialog/update-city-dialog.component';
+import { Observable } from 'rxjs/internal/Observable';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
   selector: 'app-city-list',
@@ -29,7 +32,6 @@ export class CityListComponent {
     this.cityService.getAllCities(this.query).subscribe({
       next: (data) => {
         this.cities = data;
-        console.log(data);
       },
       error: (err) => {
         console.error('Error:', err);
@@ -37,10 +39,19 @@ export class CityListComponent {
     });
   }
 
+  getCity(id: number): Observable<CityDto | null> {
+    return this.cityService.getCity(id).pipe(
+      catchError((err) => {
+        console.error('Error:', err);
+        return of(null);
+      })
+    );
+  }
+
   deleteCity(id: number) {
     this.cityService.deleteCity(id).subscribe({
       next: () => {
-        this.getAllCities();
+        this.cities = this.cities?.filter((city) => city.id !== id) ?? null;
       },
       error: (err) => {
         console.error('Error:', err);
@@ -50,8 +61,14 @@ export class CityListComponent {
 
   createCity(command: CreateCityCommand) {
     this.cityService.createCity(command).subscribe({
-      next: () => {
-        this.getAllCities();
+      next: (id: number) => {
+        this.getCity(id).subscribe((city) => {
+          if (city) {
+            this.cities?.push(city);
+          } else {
+            console.log('City not found or error occurred.');
+          }
+        });
       },
       error: (err) => {
         console.error('Error:', err);
@@ -62,7 +79,16 @@ export class CityListComponent {
   updateCity(command: UpdateCityCommand) {
     this.cityService.updateCity(command).subscribe({
       next: () => {
-        this.getAllCities();
+        this.getCity(command.id).subscribe((updatedCity) => {
+          if (updatedCity) {
+            this.cities =
+              this.cities?.map((city) =>
+                city.id === command.id ? updatedCity : city
+              ) ?? null;
+          } else {
+            console.log('City not found or error occurred.');
+          }
+        });
       },
       error: (err) => {
         console.error('Error:', err);
