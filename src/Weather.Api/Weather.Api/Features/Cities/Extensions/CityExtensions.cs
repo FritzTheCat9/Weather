@@ -32,7 +32,7 @@ public static class CityExtensions
         public string Name { get; set; }
         public WeatherInfoDto WeatherInfoDto { get; set; }
     }
-    
+
     public class WeatherInfoDto
     {
         public string Temperature { get; set; }

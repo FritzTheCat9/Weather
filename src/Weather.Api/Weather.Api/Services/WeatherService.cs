@@ -27,7 +27,7 @@ public class WeatherService : IWeatherService
 
             var iconUrl = $"https://wttr.in/{encodedCity}?format=\"%c\"";
             var iconDataJson = await client.GetStringAsync(iconUrl);
-            
+
             return new CityExtensions.WeatherInfoDto
             {
                 Temperature = currentCondition.GetProperty("temp_C").GetString(),
@@ -35,7 +35,7 @@ public class WeatherService : IWeatherService
                 Pressure = currentCondition.GetProperty("pressure").GetString(),
                 Description = currentCondition.GetProperty("weatherDesc")[0].GetProperty("value").GetString(),
                 WindSpeedKmph = currentCondition.GetProperty("windspeedKmph").GetString(),
-                Icon = iconDataJson.Replace("\"", "").Trim(),
+                Icon = iconDataJson.Replace("\"", "").Trim()
             };
         }
         catch (Exception ex)

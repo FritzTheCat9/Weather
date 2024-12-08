@@ -42,10 +42,10 @@ public static class GetCityFeature
             CancellationToken cancellationToken)
         {
             var city = await cityRepository.Get(query.Id) ?? throw new MyNotFoundException();
-            
+
             var cityDto = city.ToDto();
             cityDto.WeatherInfoDto = await weatherService.GetWeatherInfo(cityDto.Name);
-            
+
             return cityDto;
         }
     }
