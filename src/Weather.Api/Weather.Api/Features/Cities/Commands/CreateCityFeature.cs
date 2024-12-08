@@ -17,8 +17,8 @@ public static class CreateCityFeature
     {
         public Validator()
         {
-            // name not empty 
-            // first name letter should be from uppercase (or set it in logic)
+            RuleFor(x => x.Name)
+                .NotEmpty();
         }
     }
 
@@ -43,8 +43,6 @@ public static class CreateCityFeature
             Command command,
             CancellationToken cancellationToken)
         {
-            // validate: city with given name exist
-
             var city = new City
             {
                 Id = 0,

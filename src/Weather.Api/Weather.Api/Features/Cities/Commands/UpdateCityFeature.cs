@@ -18,8 +18,8 @@ public static class UpdateCityFeature
     {
         public Validator()
         {
-            // name not empty 
-            // first name letter should be from uppercase
+            RuleFor(x => x.Name)
+                .NotEmpty();
         }
     }
 
@@ -47,8 +47,6 @@ public static class UpdateCityFeature
             CancellationToken cancellationToken)
         {
             var city = await cityRepository.Get(command.Id) ?? throw new MyNotFoundException();
-
-            //check if name exists
 
             city.Name = command.Name;
 
